@@ -7,16 +7,41 @@ const path = require('path');
 const app = express();
 const db = require('./db');
 
+
+// Middleware .................................................................
 // Serve static home page
 const publicPath = path.resolve(__dirname, "public");
 app.use(express.static(publicPath));
+app.use(express.urlencoded({ extended: true }));
+
+// ~ Routes ...................................................................
+app.get('/posts', (req, res) => {
+    console.log(`GET /posts`);
+    db.getPosts()
+        .then(posts => {
+            res.send(posts);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+});
+
+app.post('/posts', (req, res) => {
+    console.log(`POST /posts`);
+    db.newPost(req.body.username, req.body.content);
+    res.end(0);
+});
+
+app.post('/post', (req, res) => {
+    console.log(`POST /post`);
+    console.log(req.body);
+    db.updatePost(req.body.postID, req.body.content);
+    res.end(0);
+});
 
 // Listen for requests
 var port = process.env.PORT | 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
-
-// console.log(db.getPosts());
-db.getOnePost(1).then(res => console.log(res));
 
 /**
  * Graceful shutdown on SIGINT

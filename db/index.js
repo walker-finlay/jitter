@@ -48,6 +48,15 @@ module.exports = {
                 console.log(`Inserted ${result.affectedRows} rows.`);
             });
     },
+    updatePost(postID, newContent) {
+        connection.query(
+            'UPDATE posts SET content=? WHERE id=?', [newContent, postID],
+            (err, result) => {
+                if (err) throw err;
+                console.log(`Updated ${result.affectedRows} rows.`)
+            }
+        );
+    },
     /**
      * Always terminate db connections before exit
      */

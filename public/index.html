@@ -6,16 +6,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="index.css">
-
     <title>Jitter</title>
 
-    <!-- TinyMCE script -->
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- TinyMCE scripts -->
     <script src="https://cdn.tiny.cloud/1/zj1zwm2f2yron4zx6e7qqn2mbq77ixxqqiy99d7ymcuxpqet/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/zj1zwm2f2yron4zx6e7qqn2mbq77ixxqqiy99d7ymcuxpqet/tinymce/5/jquery.tinymce.min.js" referrerpolicy="origin"></script>
+
     <script>
         tinymce.init({
             selector: "#inputarea",
-            plugins: 'core link quickbars fullscreen codesample',
+            plugins: 'link quickbars fullscreen codesample',
             menubar: false,
             resize: false,
             statusbar: false,
@@ -23,6 +25,9 @@
             fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px'
         });
     </script>
+
+    <link rel="stylesheet" href="index.css">
+    <script src="index.js"></script>
 </head>
 
 <body>
@@ -32,17 +37,23 @@
     <div class="container">
         <div class="main">
             <div class="input-container">
-                <textarea id="inputarea"></textarea>
-                <button id="jeetit">Jeet</button>
+                <form action id="new-post">
+                    <textarea id="inputarea"></textarea>
+                    <button type="submit" id="jeetbutton">Jeet</button>
+                </form>
             </div>
             <div class="content">
                 <div class="recent">
-                    Nothing here yet!
+                    <h2>Latest Posts</h2>
+                    <div id="latest"></div>
                 </div>
                 <div class="user-profile">
                     <img id="pro-pic" alt="walker-profile-picture" src="images/IMG_0108.JPG" width="50px" height="50px">
-                    <h2>Walker Finlay</h2>
-                    <h3>Total Posts:</h3>
+                    <h2>walker-finlay</h2>
+                    <h3>Total Posts: <span id="post-count">0</span></h3>
+                    <p>Name: Walker Finlay</p>
+                    <p>Email: <a href="mailto:mwf319@lehigh.edu">mwf319@lehigh.edu</a></p>
+                    <p>Website: <a href="https://github.com/walker-finlay">https://github.com/walker-finlay</a></p>
                 </div>
             </div>
         </div>
