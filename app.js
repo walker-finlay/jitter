@@ -15,14 +15,21 @@ app.use(express.static(publicPath));
 var port = process.env.PORT | 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
+// console.log(db.getPosts());
+db.getOnePost(1).then(res => console.log(res));
+
 /**
  * Graceful shutdown on SIGINT
  */
 process.on('SIGINT', () => {
-    (async() => {
-        console.log('Received SIGINT');
-        await db.cleanExit();
-        // Control should never reach here
-        process.exit();
-    })();
+    console.log('Received SIGINT');
+    db.disconnect()
+        .then(status => {
+            console.log(`Connection closed: ${status}`);
+            process.exit();
+        })
+        .catch(err => {
+            console.error(err);
+            process.exit();
+        });
 });
