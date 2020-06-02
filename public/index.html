@@ -6,14 +6,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="stylesheet" href="index.css">
+
     <title>Jitter</title>
+
+    <!-- TinyMCE script -->
+    <script src="https://cdn.tiny.cloud/1/zj1zwm2f2yron4zx6e7qqn2mbq77ixxqqiy99d7ymcuxpqet/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: "#inputarea",
+            plugins: 'core link quickbars fullscreen codesample',
+            menubar: false,
+            resize: false,
+            statusbar: false,
+            toolbar: 'bold italic underline | fontsizeselect forecolor | link unlink | quickimage | removeformat codesample fullscreen',
+            fontsize_formats: '11px 12px 14px 16px 18px 24px 36px 48px'
+        });
+    </script>
 </head>
 
 <body>
     <div id="nav">
         <h1>Jitter</h1>
     </div>
-    <div id=""></div>
+    <div class="container">
+        <div class="main">
+            <div class="input-container">
+                <textarea id="inputarea"></textarea>
+                <button id="jeetit">Jeet</button>
+            </div>
+            <div class="content">
+                <div class="recent">
+                    Nothing here yet!
+                </div>
+                <div class="user-profile">
+                    <img id="pro-pic" alt="walker-profile-picture" src="images/IMG_0108.JPG" width="50px" height="50px">
+                    <h2>Walker Finlay</h2>
+                    <h3>Total Posts:</h3>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
