@@ -74,6 +74,7 @@ document.querySelector('#jeetbutton')
                         reset.innerHTML = '(edit)';
                     }
                     edit.method = 'POST';
+                    document.querySelector('#post-count').innerHTML = postCount;
                 })
                 .catch(err => { alert(`Error adding post ${err}`) });
         } else { /* Text area is empty, do nothing */
