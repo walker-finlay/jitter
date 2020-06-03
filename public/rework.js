@@ -3,51 +3,40 @@
  */
 
 var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-var domparser = new DOMParser();
+var postCount = 0;
+var edit = { method: 'POST', postID: '0' };
 
 /**
- * Generalized ajax request.
- * Returns a promise, resolving on server response, rejecting on error
- * @param {string} method REST
- * @param {string} url 
- * @param {JSON} data optional - only used for PUT and POST
+ * Helper method for adding a new post to the top of the recent list
+ * Called by adding new post and loading all posts
+ * @param {JSON} add 
  */
-function ajax(method, url, data) {
-    return new Promise((resolve, reject) => {
-        // Browser compatibility ----------------
-        if (window.XMLHttpRequest) {
-            xhr = new XMLHttpRequest();
-        } else if (window.ActiveXObject) { /* MS */
-            xhr = new ActiveXObject("Msxml2.XMLHTTP");
-            if (!xhr) {
-                xhr = new ActiveXObject("Microsoft.XMLHTTP");
-            }
-        }
-        if (!xhr) reject("What browser are you using?");
+function displayPost(add) {
+    let postDiv = document.createElement('div');
+    let innerDiv = document.createElement('div');
+    innerDiv.id = `p${add.id}`;
+    innerDiv.innerHTML = add.content;
+    postDiv.appendChild(innerDiv);
 
-        // bind readystatechange handler --------
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    let responseData =
-                        xhr.responseText ?
-                        JSON.parse(xhr.responseText) : '';
-                    resolve(responseData);
-                } else {
-                    reject("Server error");
-                }
-            }
-        }
+    let date = new Date(Date.parse(add.date)).toLocaleString('en-US', options);
+    let postInfo = document.createElement('span');
 
-        // Send it ------------------------------
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
+    // Create edit button DOM node and attach event handler
+    let editbtn = document.createElement('a');
+    editbtn.href = '#';
+    editbtn.style.color = 'gray';
+    editbtn.addEventListener('click', e => {
+        editPost(e);
     });
-}
+    editbtn.innerHTML = '(edit)';
+    postInfo.innerHTML = `${date} `;
+    postInfo.appendChild(editbtn);
 
-function toggleEditMode(event) {
-    console.log(event);
+    postInfo.style.color = 'dimgray';
+    postDiv.appendChild(postInfo);
+    document.querySelector('#latest').prepend(postDiv);
+
+    postCount++;
 }
 
 // Display recent posts -------------------------
@@ -55,33 +44,65 @@ ajax('GET', '/posts')
     .then(jsonArray => {
         // console.log(jsonArray);
         for (i in jsonArray) {
-            let postDiv = document.createElement('div');
-            postDiv.id = `p${jsonArray[i].id}`;
-            postDiv.innerHTML = jsonArray[i].content;
-
-            let date = new Date(Date.parse(jsonArray[i].date)).toLocaleString('en-US', options);
-            let postInfo = document.createElement('span');
-            postInfo.innerHTML =
-                `${date} <a href="#" onclick="toggleEditMode()" class="edit" style="color: gray">(edit)</a>`;
-            postInfo.style.color = 'dimgray';
-            postDiv.appendChild(postInfo);
-            document.querySelector('#latest').prepend(postDiv);
+            displayPost(jsonArray[i]);
         }
+        document.querySelector('#post-count').innerHTML = postCount;
     })
-    .catch(err => { alert(err) });
+    .catch(err => { alert(`Error retrieving recent posts! ${err}`) });
 
-// Submit/edit a post ---------------------------
+// Submit a post --------------------------------
 document.querySelector('#jeetbutton')
     .addEventListener('click', event => {
+        event.preventDefault();
         let myContent = tinymce.activeEditor.getContent();
-        console.log(myContent);
-        tinymce.activeEditor.setContent('');
+        let newPost = { username: 'walker-finlay', content: myContent, postID: edit.postID.substr(1) };
+        if (myContent) { /* Send it to the server */
+            ajax(edit.method, '/posts', newPost)
+                .then(res => {
+                    console.log(res);
+                    tinymce.activeEditor.setContent('');
+                    if (edit.method == 'POST') {
+                        displayPost({ id: res, content: myContent, date: new Date(Date.now()) });
+                    } else {
+                        document.querySelector(`#${edit.postID}`).innerHTML = myContent;
+                        console.log(document.querySelector(`#${edit.postID}`));
+                    }
+                    let reset = document.querySelector('.cancel');
+                    reset.className = 'edit';
+                    reset.style.color = 'gray';
+                    reset.innerHTML = '(edit)';
+                    edit.method = 'POST';
+                })
+                .catch(err => { alert(`Error adding post ${err}`) });
+        } else { /* Text area is empty, do nothing */
+            return;
+        }
     });
 
+// Edit a post ----------------------------------
+function editPost(event) { /* This is messy */
+    edit.method = 'PUT';
+    let cancels = document.querySelector('.cancel');
+    if (cancels) {
+        cancels.className = 'edit';
+        cancels.style.color = 'gray';
+        cancels.innerHTML = '(edit)';
+        if (cancels == event.target) tinymce.activeEditor.setContent('');
+    }
 
+    event.target.className = 'cancel';
+    event.target.innerHTML = '(cancel)';
+    event.target.style.color = 'red';
+    let current = event.target.parentElement.parentElement.cloneNode(true);
+    current.removeChild(current.lastChild);
+    tinymce.activeEditor.setContent(current.innerHTML);
+    edit.postID = event.target.parentElement.previousSibling.id;
 
-
-
-// let data = { username: 'walker-finlay', content: 'my message 2' };
-// ajax('POST', '/posts', data)
-//     .catch(err => { alert(err) });
+    if (cancels == event.target) {
+        cancels.className = 'edit';
+        cancels.style.color = 'gray';
+        cancels.innerHTML = '(edit)';
+        tinymce.activeEditor.setContent('');
+        edit.method = 'POST';
+    }
+}

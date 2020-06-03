@@ -30,11 +30,14 @@ app.get('/posts', (req, res) => {
 app.post('/posts', (req, res) => {
     // console.log(`POST /posts`);
     console.log(req.body);
-    db.newPost(req.body.username, req.body.content);
-    res.end(0);
+    db.newPost(req.body.username, req.body.content)
+        .then(newID => {
+            res.send(String(newID));
+        })
+        .catch(err => console.error(err));
 });
 
-app.put('/post', (req, res) => {
+app.put('/posts', (req, res) => {
     console.log(`PUT /post`);
     console.log(req.body);
     db.updatePost(req.body.postID, req.body.content);

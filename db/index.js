@@ -41,12 +41,17 @@ module.exports = {
 
     },
     newPost(author, content) {
-        connection.query(
-            'INSERT INTO posts (author, content) VALUES (?, ?)', [author, content],
-            (err, result) => {
-                if (err) throw err;
-                console.log(`Inserted ${result.affectedRows} rows.`);
-            });
+        return new Promise((resolve, reject) => {
+            connection.query(
+                'INSERT INTO posts (author, content) VALUES (?, ?)', [author, content],
+                (err, result) => {
+                    if (err) reject(err);
+                    console.log(`Inserted ${result.affectedRows} rows.`);
+                    console.log(`Returned new id ${result.insertId}`);
+                    resolve(result.insertId);
+                });
+        });
+
     },
     updatePost(postID, newContent) {
         connection.query(
