@@ -68,9 +68,11 @@ document.querySelector('#jeetbutton')
                         console.log(document.querySelector(`#${edit.postID}`));
                     }
                     let reset = document.querySelector('.cancel');
-                    reset.className = 'edit';
-                    reset.style.color = 'gray';
-                    reset.innerHTML = '(edit)';
+                    if (reset) {
+                        reset.className = 'edit';
+                        reset.style.color = 'gray';
+                        reset.innerHTML = '(edit)';
+                    }
                     edit.method = 'POST';
                 })
                 .catch(err => { alert(`Error adding post ${err}`) });
