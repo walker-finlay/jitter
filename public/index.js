@@ -1,75 +1,61 @@
 var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
 var editMode = { method: '/posts', postID: 0 };
 
-$(document).ready(() => {
-
-    $.ajax(
-        '/posts', {
-            method: 'GET',
-            dataType: 'json',
-            success: jsonArray => {
-                // console.log(jsonArray);
-                for (i in jsonArray) { /* There's probably a better way to do this  */
-                    updateUI(jsonArray[i]);
-                }
-                bindEditHanders();
-                $('#post-count').html(jsonArray.length);
-            },
-            error: (jqXHR, textStatus, errorThrown) => {
-                alert(`There was an error retrieving recent posts: ${errorThrown}`);
-            }
+/**
+ * Taken from an old school project
+ * @param {string} reqType 
+ * @param {string} url 
+ * @param {boolean} async 
+ */
+function httpRequest(reqType, url, async, body) {
+    if (window.XMLHttpRequest) {
+        request = new XMLHttpRequest();
+    } else if (window.ActiveXObject) { /* IE */
+        request = new ActiveXObject("Msxml2.XMLHTTP");
+        if (!request) {
+            request = new ActiveXObject("Microsoft.XMLHTTP");
         }
-    );
+    }
+    if (request) {
+        initReq(reqType, url, async, body);
+    } else {
+        alert("Your browser doesn't support any features?");
+    }
+}
 
-    $('#jeetbutton').click(e => {
-        e.preventDefault();
-        let data = $('#inputarea').tinymce().getContent();
-        if (data) {
-            $.ajax(
-                editMode.method, {
-                    method: 'POST',
-                    data: { 'username': 'walker-finlay', 'content': data, 'postID': editMode.postID },
-                    success: () => {
-                        let toAdd = { content: data, date: new Date(Date.now()), id: Number($('#post-count').html()) + 1 };
-                        if (editMode.method == '/posts') {
-                            $('#post-count').html(Number($('#post-count').html()) + 1);
-                            updateUI(toAdd);
-                            bindEditHanders();
-                        } else {
-                            $(`#${Number(toAdd.id)-1}`).html(toAdd.content);
-                        }
-                        // Cleanup
-                        editMode.method = '/posts';
-                        $('#inputarea').tinymce().setContent('');
-                    },
-                    error: err => {
-                        alert(`There was an error adding your post: ${err}`);
-                    }
-                }
-            );
-        } else { /* The text area was empty, do nothing */
-            editMode.method = '/posts';
-            return;
+function initReq(reqType, url, bool, body) {
+    request.onreadystatechange = handleResponse; /* Handle response asynchronously */
+
+    request.open(reqType, url, bool);
+    if (reqType == 'POST') {
+        request.setRequestHeader('Content-Type', 'application/json');
+    }
+
+    request.send({ 0: 'a' });
+}
+
+function handleResponse() {
+    if (request.readyState == 4) {
+        if (request.status == 200) {
+            let data = JSON.parse(request.responseText);
+            console.log(data);
+        } else {
+            alert("A problem occurred communicating with the server");
         }
-    });
+    }
+}
+
+// Load up recent posts
+var recentPosts = 'loaded';
+document.getElementById('latest').innerHTML = recentPosts;
+httpRequest('GET', '/posts', true);
+
+
+// Attach submit event handler
+let jeetbutton = document.getElementById('jeetbutton');
+jeetbutton.addEventListener('click', event => {
+    event.preventDefault();
+    // let postContent = tinymce.get('inputarea').getContent();
+    let postContent = 'content';
+    httpRequest('POST', '/posts', true, postContent);
 });
-
-function updateUI(toAdd) {
-    let post = $('<div>');
-    let postContent = $.parseHTML(toAdd.content);
-    $(postContent).attr('id', toAdd.id);
-    let date = new Date(Date.parse(toAdd.date)).toLocaleString('en-US', options);
-    let postInfo = $('<span>').css('color', 'dimgray');
-    $(postInfo).append(date).append(' <a href="#" class="edit" style="color: gray">(edit)</a>');
-    $(post).append(postContent).append(postInfo);
-    $('#latest').prepend(post);
-}
-
-function bindEditHanders() {
-    $('.edit').click(e => { /* Edit click handler */
-        let editable = $(e.target).parent().siblings('p');
-        editMode.postID = $(editable).attr('id');
-        $('#inputarea').tinymce().setContent($(editable).html());
-        editMode.method = '/post';
-    });
-}

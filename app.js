@@ -13,6 +13,7 @@ const db = require('./db');
 const publicPath = path.resolve(__dirname, "public");
 app.use(express.static(publicPath));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // ~ Routes ...................................................................
 app.get('/posts', (req, res) => {
@@ -27,13 +28,14 @@ app.get('/posts', (req, res) => {
 });
 
 app.post('/posts', (req, res) => {
-    console.log(`POST /posts`);
+    // console.log(`POST /posts`);
+    console.log(req.body);
     db.newPost(req.body.username, req.body.content);
     res.end(0);
 });
 
-app.post('/post', (req, res) => {
-    console.log(`POST /post`);
+app.put('/post', (req, res) => {
+    console.log(`PUT /post`);
     console.log(req.body);
     db.updatePost(req.body.postID, req.body.content);
     res.end(0);

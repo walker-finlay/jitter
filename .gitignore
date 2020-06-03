@@ -1,1 +1,6 @@
 node_modules
+notes.md
+.vscode/
+var.env
+public/index_with_jquery.js
+public/indextest.js
