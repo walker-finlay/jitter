@@ -24,11 +24,10 @@ function displayPost(add) {
     // Create edit button DOM node and attach event handler
     let editbtn = document.createElement('a');
     editbtn.href = '#';
-    editbtn.style.color = 'gray';
+    editStyle(editbtn);
     editbtn.addEventListener('click', e => {
         editPost(e);
     });
-    editbtn.innerHTML = '(edit)';
     postInfo.innerHTML = `${date} `;
     postInfo.appendChild(editbtn);
 
@@ -67,12 +66,7 @@ document.querySelector('#jeetbutton')
                         document.querySelector(`#${edit.postID}`).innerHTML = myContent;
                         console.log(document.querySelector(`#${edit.postID}`));
                     }
-                    let reset = document.querySelector('.cancel');
-                    if (reset) {
-                        reset.className = 'edit';
-                        reset.style.color = 'gray';
-                        reset.innerHTML = '(edit)';
-                    }
+                    editStyle(document.querySelector('.cancel'))
                     edit.method = 'POST';
                     document.querySelector('#post-count').innerHTML = postCount;
                 })
@@ -82,16 +76,21 @@ document.querySelector('#jeetbutton')
         }
     });
 
+// Helper function to change a cancel link to an edit link
+function editStyle(node) {
+    if (node) {
+        node.className = 'edit';
+        node.style.color = 'gray';
+        node.innerHTML = '(edit)';
+    }
+}
+
 // Edit a post ----------------------------------
 function editPost(event) { /* This is messy */
     edit.method = 'PUT';
     let cancels = document.querySelector('.cancel');
-    if (cancels) {
-        cancels.className = 'edit';
-        cancels.style.color = 'gray';
-        cancels.innerHTML = '(edit)';
-        if (cancels == event.target) tinymce.activeEditor.setContent('');
-    }
+    editStyle(cancels)
+    if (cancels == event.target) tinymce.activeEditor.setContent('');
 
     event.target.className = 'cancel';
     event.target.innerHTML = '(cancel)';
@@ -102,9 +101,7 @@ function editPost(event) { /* This is messy */
     edit.postID = event.target.parentElement.previousSibling.id;
 
     if (cancels == event.target) {
-        cancels.className = 'edit';
-        cancels.style.color = 'gray';
-        cancels.innerHTML = '(edit)';
+        editStyle(cancels);
         tinymce.activeEditor.setContent('');
         edit.method = 'POST';
     }
