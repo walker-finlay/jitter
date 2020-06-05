@@ -34,7 +34,10 @@ app.post('/posts', (req, res) => {
         .then(newID => {
             res.send(String(newID));
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+            console.error(err);
+            res.status(403).send(err);
+        });
 });
 
 app.put('/posts', (req, res) => {

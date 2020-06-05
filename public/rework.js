@@ -70,7 +70,10 @@ document.querySelector('#jeetbutton')
                     edit.method = 'POST';
                     document.querySelector('#post-count').innerHTML = postCount;
                 })
-                .catch(err => { alert(`Error adding post ${err}`) });
+                .catch(err => {
+                    alert(`Error adding post: ${err}`);
+                    tinymce.activeEditor.setContent('');
+                });
         } else { /* Text area is empty, do nothing */
             return;
         }

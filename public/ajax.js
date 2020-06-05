@@ -27,7 +27,7 @@ function ajax(method, url, data) {
                         JSON.parse(xhr.responseText) : '';
                     resolve(responseData);
                 } else {
-                    reject("Server error");
+                    reject(xhr.responseText);
                 }
             }
         }

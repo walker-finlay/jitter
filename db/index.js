@@ -46,9 +46,11 @@ module.exports = {
                 'INSERT INTO posts (author, content) VALUES (?, ?)', [author, content],
                 (err, result) => {
                     if (err) reject(err);
-                    console.log(`Inserted ${result.affectedRows} rows.`);
-                    console.log(`Returned new id ${result.insertId}`);
-                    resolve(result.insertId);
+                    if (result != undefined) {
+                        console.log(`Inserted ${result.affectedRows} rows.`);
+                        console.log(`Returned new id ${result.insertId}`);
+                        resolve(result.insertId);
+                    } else { reject('Too many characters!') }
                 });
         });
 
