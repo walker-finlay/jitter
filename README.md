@@ -10,4 +10,5 @@ Jitter uses javascript for the backend. Its entry point is `/app.js` and takes y
 - more direct DOM manipulation, fewer html re-rendering methods
 - swap divs for more specific tags (`<list>`, `<head>`, etc)
 - swap CSS animation for CSS transition
-- for ... of instead of for ... in
+- for ... of instead of for ... in for arrays
+- only style classes (no id, no tag)
